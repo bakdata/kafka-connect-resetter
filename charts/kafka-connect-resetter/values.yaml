@@ -1,0 +1,33 @@
+nameOverride: kafka-connect-resetter
+
+image: kafka-connect-resetter
+imageTag: latest
+imagePullPolicy: Always
+
+connectorType: source
+
+config:
+  #  brokers: "test:9092"
+  #  connector: "my-connector"
+  #  config:
+  #    schema.registry.url: "http://test:8081/"
+
+  # ---------------------------
+  # SINK CONNECTOR OPTIONS
+  # ---------------------------
+  #  deleteConsumerGroup: true
+
+  # ---------------------------
+  # SOURCE CONNECTOR OPTIONS
+  # ---------------------------
+  offsetTopic: "offsets"
+#  pollDuration: "PT10S"
+#  converter: "org.apache.kafka.connect.json.JsonConverter"
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 300Mi
+  limits:
+    cpu: 500m
+    memory: 2G
