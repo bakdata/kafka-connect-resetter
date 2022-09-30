@@ -63,7 +63,7 @@ import picocli.CommandLine.Mixin;
  * This command resets the state of a Kafka Connect source connector by sending tombstone messages for each stored Kafka
  * connect offset.
  *
- * <pre>
+ * <pre>{@code
  * Usage: <main class> source [-h] --brokers=<brokers>
  *                            [--converter=<converterClass>]
  *                            --offset-topic=<offsetTopic>
@@ -82,7 +82,7 @@ import picocli.CommandLine.Mixin;
  *                             Topic where Kafka connect offsets are stored
  *       --poll-duration=<pollDuration>
  *                             Consumer poll duration
- * </pre>
+ * }</pre>
  */
 
 @Slf4j
@@ -196,6 +196,5 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         consumer.seekToBeginning(topicPartitions);
         return consumer;
     }
-
 
 }

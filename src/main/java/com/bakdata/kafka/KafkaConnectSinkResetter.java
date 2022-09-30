@@ -46,7 +46,7 @@ import picocli.CommandLine.Option;
 /**
  * This command resets the resets or deletes the consumer group of a Kafka Connect sink connector.
  *
- * <pre>
+ * <pre>{@code
  * Usage: <main class> sink [-h] [--delete-consumer-group] --brokers=<brokers>
  *                          [--config=<String=String>[,<String=String>...]]...
  *                          <connectorName>
@@ -57,7 +57,7 @@ import picocli.CommandLine.Option;
  *       --delete-consumer-group
  *                             Whether to delete the consumer groups
  *   -h, --help                print this help and exit
- * </pre>
+ * }</pre>
  */
 @Slf4j
 @Setter(AccessLevel.PROTECTED)
