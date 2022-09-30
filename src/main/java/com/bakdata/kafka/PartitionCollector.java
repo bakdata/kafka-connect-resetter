@@ -24,6 +24,7 @@
 
 package com.bakdata.kafka;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +50,7 @@ final class PartitionCollector {
         if (this.connectorName.equals(connector)) {
             // We use a map to only collect distinct values. A set would not work because byte[] does not
             // override equals and hashCode
-            this.partitions.put(new String(bytes), bytes);
+            this.partitions.put(new String(bytes, StandardCharsets.UTF_8), bytes);
         }
     }
 

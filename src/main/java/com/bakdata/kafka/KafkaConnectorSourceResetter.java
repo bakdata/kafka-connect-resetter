@@ -25,6 +25,7 @@
 package com.bakdata.kafka;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,9 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -60,9 +59,33 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 
-@ToString
+/**
+ * This command resets the state of a Kafka Connect source connector by sending tombstone messages for each stored Kafka
+ * connect offset.
+ *
+ * <pre>
+ * Usage: <main class> source [-h] --brokers=<brokers>
+ *                            [--converter=<converterClass>]
+ *                            --offset-topic=<offsetTopic>
+ *                            [--poll-duration=<pollDuration>]
+ *                            [--config=<String=String>[,<String=String>...]]...
+ *                            <connectorName>
+ *       <connectorName>       Connector to reset
+ *       --brokers=<brokers>   List of Kafka brokers
+ *       --config=<String=String>[,<String=String>...]
+ *                             Kafka client and producer configuration properties
+ *       --converter=<converterClass>
+ *                             Converter class used by Kafka Connect to store
+ *                               offsets
+ *   -h, --help                print this help and exit
+ *       --offset-topic=<offsetTopic>
+ *                             Topic where Kafka connect offsets are stored
+ *       --poll-duration=<pollDuration>
+ *                             Consumer poll duration
+ * </pre>
+ */
+
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(AccessLevel.PROTECTED)
 @Command(name = "source")
 public final class KafkaConnectorSourceResetter implements Runnable {
@@ -80,6 +103,8 @@ public final class KafkaConnectorSourceResetter implements Runnable {
     @CommandLine.Option(names = "--offset-topic", description = "Topic where Kafka connect offsets are stored",
             required = true)
     private String offsetTopic;
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "print this help and exit")
+    private boolean helpRequested;
 
     @CommandLine.Option(names = "--poll-duration", description = "Consumer poll duration")
     private Duration pollDuration = Duration.ofSeconds(10);
@@ -113,9 +138,9 @@ public final class KafkaConnectorSourceResetter implements Runnable {
             producer.initTransactions();
             producer.beginTransaction();
             for (final byte[] partition : partitions) {
-                final ProducerRecord<byte[], byte[]> record = this.createResetRecord(partition);
-                log.info("Resetting partition {}", new String(partition));
-                producer.send(record);
+                final ProducerRecord<byte[], byte[]> producerRecord = this.createResetRecord(partition);
+                log.info("Resetting partition {}", new String(partition, StandardCharsets.UTF_8));
+                producer.send(producerRecord);
             }
             producer.commitTransaction();
         }
@@ -132,7 +157,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
             ConsumerRecords<byte[], byte[]> records;
             do {
                 records = consumer.poll(this.pollDuration);
-                records.forEach(record -> collector.handle(record.key()));
+                records.forEach(consumerRecord -> collector.handle(consumerRecord.key()));
             } while (!records.isEmpty());
             consumer.unsubscribe();
         }
@@ -155,7 +180,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
             return converter;
         } catch (final InstantiationException | NoSuchMethodException | IllegalAccessException |
                        InvocationTargetException e) {
-            throw new RuntimeException("Error creating converter of class " + this.converterClass.getName(), e);
+            throw new ResetterException("Error creating converter of class " + this.converterClass.getName(), e);
         }
     }
 

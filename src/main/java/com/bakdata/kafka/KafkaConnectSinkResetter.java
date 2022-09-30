@@ -38,19 +38,37 @@ import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.jooq.lambda.tuple.Tuple2;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
+/**
+ * This command resets the resets or deletes the consumer group of a Kafka Connect sink connector.
+ *
+ * <pre>
+ * Usage: <main class> sink [-h] [--delete-consumer-group] --brokers=<brokers>
+ *                          [--config=<String=String>[,<String=String>...]]...
+ *                          <connectorName>
+ *       <connectorName>       Connector to reset
+ *       --brokers=<brokers>   List of Kafka brokers
+ *       --config=<String=String>[,<String=String>...]
+ *                             Kafka client and producer configuration properties
+ *       --delete-consumer-group
+ *                             Whether to delete the consumer groups
+ *   -h, --help                print this help and exit
+ * </pre>
+ */
 @Slf4j
-@Command(name = "sink")
 @Setter(AccessLevel.PROTECTED)
-public class KafkaConnectSinkResetter implements Runnable {
+@Command(name = "sink")
+public final class KafkaConnectSinkResetter implements Runnable {
     @Mixin
     private SharedOptions sharedOptions;
-
     @Option(names = "--delete-consumer-group", description = "Whether to delete the consumer groups")
-    private boolean deleteConsumerGroup = false;
+    private boolean deleteConsumerGroup;
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "print this help and exit")
+    private boolean helpRequested;
 
     private static Tuple2<TopicPartition, OffsetAndMetadata> setOffsetToZero(
             final TopicPartition topicPartition, final OffsetAndMetadata oldOffsetAndMetadata) {
@@ -73,9 +91,9 @@ public class KafkaConnectSinkResetter implements Runnable {
             adminClient.alterConsumerGroupOffsets(consumerGroupID, newOffsets).all().get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to alter consumer group offsets", e);
+            throw new ResetterException("Failed to alter consumer group offsets", e);
         } catch (final ExecutionException e) {
-            throw new RuntimeException("Failed to alter consumer group offsets", e);
+            throw new ResetterException("Failed to alter consumer group offsets", e);
         }
 
     }
@@ -87,9 +105,9 @@ public class KafkaConnectSinkResetter implements Runnable {
             deleteConsumerGroupsResult.all().get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to delete consumer group", e);
+            throw new ResetterException("Failed to delete consumer group", e);
         } catch (final ExecutionException e) {
-            throw new RuntimeException("Failed to delete consumer group", e);
+            throw new ResetterException("Failed to delete consumer group", e);
         }
         log.info("Deleted consumer group {}", consumerGroupID);
     }
