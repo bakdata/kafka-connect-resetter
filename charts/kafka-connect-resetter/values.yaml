@@ -1,6 +1,6 @@
 nameOverride: kafka-connect-resetter
 
-image: kafka-connect-resetter
+image: bakdata/kafka-connect-resetter
 imageTag: latest
 imagePullPolicy: Always
 
