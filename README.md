@@ -47,9 +47,14 @@ Usage: <main class> sink [-h] [--delete-consumer-group] --brokers=<brokers>
       --config=<String=String>[,<String=String>...]
                             Kafka client and producer configuration properties
       --delete-consumer-group
-                            Whether to delete the consumer groups
+                            Whether to delete the consumer group
   -h, --help                print this help and exit
 ```
+
+### Helm Charts
+
+For the configuration and deployment to Kubernetes, you can use
+the [Helm Chart](https://github.com/bakdata/kafka-connect-resetter/tree/master/charts).
 
 ## Development
 

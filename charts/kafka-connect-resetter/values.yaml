@@ -9,13 +9,13 @@ connectorType: source
 config:
   #  brokers: "test:9092"
   #  connector: "my-connector"
-  #  config:
+  config: {}
   #    schema.registry.url: "http://test:8081/"
 
   # ---------------------------
   # SINK CONNECTOR OPTIONS
   # ---------------------------
-  #  deleteConsumerGroup: true
+  deleteConsumerGroup: false
 
   # ---------------------------
   # SOURCE CONNECTOR OPTIONS
@@ -23,6 +23,15 @@ config:
   offsetTopic: "offsets"
 #  pollDuration: "PT10S"
 #  converter: "org.apache.kafka.connect.json.JsonConverter"
+
+annotations: {}
+#  MY_ANNOTATION: "foo-bar"
+
+labels: {}
+#  MY_LABEL: "foo-bar"
+
+restartPolicy: OnFailure
+#ttlSecondsAfterFinished: 100
 
 resources:
   requests:

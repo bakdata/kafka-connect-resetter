@@ -55,7 +55,7 @@ import picocli.CommandLine.Option;
  *       --config=<String=String>[,<String=String>...]
  *                             Kafka client and producer configuration properties
  *       --delete-consumer-group
- *                             Whether to delete the consumer groups
+ *                             Whether to delete the consumer group
  *   -h, --help                print this help and exit
  * }</pre>
  */
@@ -65,7 +65,7 @@ import picocli.CommandLine.Option;
 public final class KafkaConnectSinkResetter implements Runnable {
     @Mixin
     private SharedOptions sharedOptions;
-    @Option(names = "--delete-consumer-group", description = "Whether to delete the consumer groups")
+    @Option(names = "--delete-consumer-group", description = "Whether to delete the consumer group")
     private boolean deleteConsumerGroup;
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "print this help and exit")
     private boolean helpRequested;
