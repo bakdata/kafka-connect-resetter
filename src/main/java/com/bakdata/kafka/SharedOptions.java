@@ -31,6 +31,9 @@ import lombok.Setter;
 import org.apache.kafka.clients.CommonClientConfigs;
 import picocli.CommandLine;
 
+/**
+ * Shared CLI options to configure Kafka Connect resetters.
+ */
 @Getter
 @Setter
 public class SharedOptions {
