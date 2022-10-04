@@ -24,7 +24,6 @@
 
 package com.bakdata.kafka;
 
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,7 +34,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -64,8 +62,7 @@ import picocli.CommandLine.Mixin;
  * connect offset.
  *
  * <pre>{@code
- * Usage: <main class> source [-h] --brokers=<brokers>
- *                            [--converter=<converterClass>]
+ * Usage: <main class> source [-hV] --brokers=<brokers>
  *                            --offset-topic=<offsetTopic>
  *                            [--poll-duration=<pollDuration>]
  *                            [--config=<String=String>[,<String=String>...]]...
@@ -74,20 +71,18 @@ import picocli.CommandLine.Mixin;
  *       --brokers=<brokers>   List of Kafka brokers
  *       --config=<String=String>[,<String=String>...]
  *                             Kafka client and producer configuration properties
- *       --converter=<converterClass>
- *                             Converter class used by Kafka Connect to store
- *                               offsets
- *   -h, --help                print this help and exit
+ *   -h, --help                Show this help message and exit.
  *       --offset-topic=<offsetTopic>
  *                             Topic where Kafka connect offsets are stored
  *       --poll-duration=<pollDuration>
  *                             Consumer poll duration
+ *   -V, --version             Print version information and exit.
  * }</pre>
  */
 
 @Slf4j
-@Setter(AccessLevel.PROTECTED)
-@Command(name = "source")
+@Setter
+@Command(name = "source", mixinStandardHelpOptions = true)
 public final class KafkaConnectorSourceResetter implements Runnable {
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4)
@@ -103,13 +98,9 @@ public final class KafkaConnectorSourceResetter implements Runnable {
     @CommandLine.Option(names = "--offset-topic", description = "Topic where Kafka connect offsets are stored",
             required = true)
     private String offsetTopic;
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "print this help and exit")
-    private boolean helpRequested;
 
     @CommandLine.Option(names = "--poll-duration", description = "Consumer poll duration")
     private Duration pollDuration = Duration.ofSeconds(10);
-    @CommandLine.Option(names = "--converter", description = "Converter class used by Kafka Connect to store offsets")
-    private Class<? extends Converter> converterClass = JsonConverter.class;
 
     private static Producer<byte[], byte[]> createProducer(final Map<String, Object> kafkaConfig) {
         final Serializer<byte[]> serializer = new ByteArraySerializer();
@@ -118,6 +109,12 @@ public final class KafkaConnectorSourceResetter implements Runnable {
 
     private static TopicPartition toTopicPartition(final PartitionInfo partitionInfo) {
         return new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
+    }
+
+    private static Converter createConverter(final Map<String, Object> kafkaConfig) {
+        final Converter converter = new JsonConverter();
+        converter.configure(kafkaConfig, true);
+        return converter;
     }
 
     @Override
@@ -147,7 +144,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
     }
 
     private Collection<byte[]> collectPartitions(final Map<String, Object> kafkaConfig) {
-        final Converter converter = this.createConverter(kafkaConfig);
+        final Converter converter = createConverter(kafkaConfig);
         final PartitionCollector collector = PartitionCollector.builder()
                 .converter(converter)
                 .topicName(this.offsetTopic)
@@ -171,17 +168,6 @@ public final class KafkaConnectorSourceResetter implements Runnable {
 
     private ProducerRecord<byte[], byte[]> createResetRecord(final byte[] partition) {
         return new ProducerRecord<>(this.offsetTopic, partition, null);
-    }
-
-    private Converter createConverter(final Map<String, Object> kafkaConfig) {
-        try {
-            final Converter converter = this.converterClass.getDeclaredConstructor().newInstance();
-            converter.configure(kafkaConfig, true);
-            return converter;
-        } catch (final InstantiationException | NoSuchMethodException | IllegalAccessException |
-                       InvocationTargetException e) {
-            throw new ResetterException("Error creating converter of class " + this.converterClass.getName(), e);
-        }
     }
 
     private Consumer<byte[], byte[]> createConsumer(final Map<String, Object> kafkaConfig) {

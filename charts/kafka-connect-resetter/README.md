@@ -34,7 +34,7 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 | `connectorType`    | Type of connector that should be reset. Can be `sink` or `source`. (required) | `source` |
 | `config.brokers`   | Comma separated list of Kafka brokers to connect to. (required)               |          |
 | `config.connector` | Name of connector to reset. (required)                                        |          |
-| `config.config`    | Configurations for Kafka clients and Kafka Connect converter.                 | `{}`     |
+| `config.config`    | Configurations for Kafka clients.                                             | `{}`     |
 
 ### Sink Connectors
 

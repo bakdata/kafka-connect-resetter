@@ -56,10 +56,6 @@ spec:
             - "--poll-duration"
             - {{ .Values.config.pollDuration }}
             {{- end }}
-            {{- if hasKey .Values.config "converter" }}
-            - "--converter"
-            - {{ .Values.config.converter }}
-            {{- end }}
             {{- end }}
             {{- if .Values.config.config }}
             - "--config"

@@ -26,15 +26,14 @@ package com.bakdata.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.kafka.clients.CommonClientConfigs;
 import picocli.CommandLine;
 
 @Getter
-@Setter(AccessLevel.PROTECTED)
-class SharedOptions {
+@Setter
+public class SharedOptions {
     @CommandLine.Parameters(index = "0", description = "Connector to reset")
     private String connectorName;
     @CommandLine.Option(names = "--brokers", description = "List of Kafka brokers", required = true)

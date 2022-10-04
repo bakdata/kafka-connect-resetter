@@ -51,7 +51,6 @@ configure<org.hildan.github.changelog.plugin.GitHubChangelogExtension> {
 dependencies {
     val kafkaVersion: String by project
     implementation(group = "org.apache.kafka", name = "connect-json", version = kafkaVersion)
-    api(group = "org.apache.kafka", name = "connect-api", version = kafkaVersion)
     implementation(group = "info.picocli", name = "picocli", version = "4.6.1")
     implementation(group = "org.apache.kafka", name = "kafka-clients", version = kafkaVersion)
     implementation(group = "com.bakdata.seq2", name = "seq2", version = "1.0.4")

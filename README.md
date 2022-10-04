@@ -14,8 +14,7 @@ This command resets the state of a Kafka Connect source connector by sending tom
 connect offset.
 
 ```
-Usage: <main class> source [-h] --brokers=<brokers>
-                           [--converter=<converterClass>]
+Usage: <main class> source [-hV] --brokers=<brokers>
                            --offset-topic=<offsetTopic>
                            [--poll-duration=<pollDuration>]
                            [--config=<String=String>[,<String=String>...]]...
@@ -24,14 +23,12 @@ Usage: <main class> source [-h] --brokers=<brokers>
       --brokers=<brokers>   List of Kafka brokers
       --config=<String=String>[,<String=String>...]
                             Kafka client and producer configuration properties
-      --converter=<converterClass>
-                            Converter class used by Kafka Connect to store
-                              offsets
-  -h, --help                print this help and exit
+  -h, --help                Show this help message and exit.
       --offset-topic=<offsetTopic>
                             Topic where Kafka connect offsets are stored
       --poll-duration=<pollDuration>
                             Consumer poll duration
+  -V, --version             Print version information and exit.
 ```
 
 ### Sink resetter
@@ -39,7 +36,7 @@ Usage: <main class> source [-h] --brokers=<brokers>
 This command resets the resets or deletes the consumer group of a Kafka Connect sink connector.
 
 ```
-Usage: <main class> sink [-h] [--delete-consumer-group] --brokers=<brokers>
+Usage: <main class> sink [-hV] [--delete-consumer-group] --brokers=<brokers>
                          [--config=<String=String>[,<String=String>...]]...
                          <connectorName>
       <connectorName>       Connector to reset
@@ -48,7 +45,8 @@ Usage: <main class> sink [-h] [--delete-consumer-group] --brokers=<brokers>
                             Kafka client and producer configuration properties
       --delete-consumer-group
                             Whether to delete the consumer group
-  -h, --help                print this help and exit
+  -h, --help                Show this help message and exit.
+  -V, --version             Print version information and exit.
 ```
 
 ### Helm Charts

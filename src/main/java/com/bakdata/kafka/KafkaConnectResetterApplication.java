@@ -24,19 +24,15 @@
 
 package com.bakdata.kafka;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 /**
  * This application resets the Kafka Connect connectors. Available commands are {@code source} and {@code sink}.
  */
-@Command(subcommands = {KafkaConnectorSourceResetter.class, KafkaConnectSinkResetter.class})
-@Setter(AccessLevel.PRIVATE)
+@Command(subcommands = {KafkaConnectorSourceResetter.class, KafkaConnectSinkResetter.class},
+        mixinStandardHelpOptions = true)
 public final class KafkaConnectResetterApplication {
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "print this help and exit")
-    private boolean helpRequested;
 
     /**
      * Run Kafka Connect resetter.

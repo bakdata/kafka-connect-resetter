@@ -28,7 +28,6 @@ import com.bakdata.util.seq2.PairSeq;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
@@ -38,7 +37,6 @@ import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.jooq.lambda.tuple.Tuple2;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
@@ -47,7 +45,7 @@ import picocli.CommandLine.Option;
  * This command resets the resets or deletes the consumer group of a Kafka Connect sink connector.
  *
  * <pre>{@code
- * Usage: <main class> sink [-h] [--delete-consumer-group] --brokers=<brokers>
+ * Usage: <main class> sink [-hV] [--delete-consumer-group] --brokers=<brokers>
  *                          [--config=<String=String>[,<String=String>...]]...
  *                          <connectorName>
  *       <connectorName>       Connector to reset
@@ -56,19 +54,18 @@ import picocli.CommandLine.Option;
  *                             Kafka client and producer configuration properties
  *       --delete-consumer-group
  *                             Whether to delete the consumer group
- *   -h, --help                print this help and exit
+ *   -h, --help                Show this help message and exit.
+ *   -V, --version             Print version information and exit.
  * }</pre>
  */
 @Slf4j
-@Setter(AccessLevel.PROTECTED)
-@Command(name = "sink")
+@Setter
+@Command(name = "sink", mixinStandardHelpOptions = true)
 public final class KafkaConnectSinkResetter implements Runnable {
     @Mixin
     private SharedOptions sharedOptions;
     @Option(names = "--delete-consumer-group", description = "Whether to delete the consumer group")
     private boolean deleteConsumerGroup;
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "print this help and exit")
-    private boolean helpRequested;
 
     private static Tuple2<TopicPartition, OffsetAndMetadata> setOffsetToZero(
             final TopicPartition topicPartition, final OffsetAndMetadata oldOffsetAndMetadata) {
@@ -80,7 +77,7 @@ public final class KafkaConnectSinkResetter implements Runnable {
     private static void resetConsumerGroupOffsets(final Admin adminClient, final String consumerGroupID) {
         final ListConsumerGroupOffsetsResult listConsumerGroupOffsetsResult =
                 adminClient.listConsumerGroupOffsets(consumerGroupID);
-        log.info("Reset consumer group offsets for group {}", consumerGroupID);
+        log.info("Resetting consumer group offsets for group {}", consumerGroupID);
         try {
             final Map<TopicPartition, OffsetAndMetadata> topicPartitionOffsetAndMetadataMap =
                     listConsumerGroupOffsetsResult.partitionsToOffsetAndMetadata().get();
@@ -95,10 +92,11 @@ public final class KafkaConnectSinkResetter implements Runnable {
         } catch (final ExecutionException e) {
             throw new ResetterException("Failed to alter consumer group offsets", e);
         }
-
+        log.info("Reset consumer group offsets for group {}", consumerGroupID);
     }
 
     private static void deleteConsumerGroup(final Admin adminClient, final String consumerGroupID) {
+        log.info("Deleting consumer group {}", consumerGroupID);
         final DeleteConsumerGroupsResult deleteConsumerGroupsResult =
                 adminClient.deleteConsumerGroups(List.of(consumerGroupID));
         try {
