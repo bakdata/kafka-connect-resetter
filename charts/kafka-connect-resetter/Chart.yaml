@@ -1,0 +1,4 @@
+apiVersion: v1
+name: kafka-connect-resetter
+description: A helm chart for deploying a Kafka Connect resetter.
+version: 0.1.0

@@ -1,0 +1,63 @@
+{{- $root := . -}}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "cleanup-job.fullname" . }}
+  labels:
+    app: {{ template "cleanup-job.name" . }}
+    chart: {{ template "cleanup-job.chart" . }}
+    release: {{ .Release.Name }}
+    {{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  {{- if .Values.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.ttlSecondsAfterFinished }}
+  {{- end }}
+  template:
+    metadata:
+    {{- if .Values.annotations }}
+      annotations:
+      {{- range $key, $value := .Values.annotations }}
+        {{ $key | quote }}: {{ $value | quote }}
+      {{- end }}
+    {{- end }}
+      labels:
+        app: {{ template "cleanup-job.name" . }}
+        release: {{ .Release.Name }}
+        {{- range $key, $value := .Values.labels }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
+    spec:
+      restartPolicy: {{ .Values.restartPolicy }}
+      containers:
+        - name: {{ template "cleanup-job.name" . }}
+          image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+          imagePullPolicy: "{{ .Values.imagePullPolicy }}"
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          args:
+            - {{ .Values.connectorType }}
+            - {{ .Values.config.connector }}
+            - "--brokers"
+            - {{ .Values.config.brokers }}
+            {{- if eq .Values.connectorType "sink"}}
+            {{- if and (hasKey .Values.config "deleteConsumerGroup") (.Values.config.deleteConsumerGroup) }}
+            - "--delete-consumer-group"
+            {{- end }}
+            {{- end }}
+            {{- if eq .Values.connectorType "source"}}
+            {{- if and (hasKey .Values.config "offsetTopic") }}
+            - "--offset-topic"
+            - {{ .Values.config.offsetTopic }}
+            {{- end }}
+            {{- if hasKey .Values.config "pollDuration" }}
+            - "--poll-duration"
+            - {{ .Values.config.pollDuration }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.config.config }}
+            - "--config"
+            - "{{- range $key, $value := .Values.config.config }}{{ $key }}={{ $value }},{{- end }}"
+            {{- end }}

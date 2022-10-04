@@ -1,0 +1,41 @@
+nameOverride: kafka-connect-resetter
+
+image: bakdata/kafka-connect-resetter
+imageTag: latest
+imagePullPolicy: Always
+
+connectorType: source
+
+config:
+  #  brokers: "test:9092"
+  #  connector: "my-connector"
+  config: {}
+  #    schema.registry.url: "http://test:8081/"
+
+  # ---------------------------
+  # SINK CONNECTOR OPTIONS
+  # ---------------------------
+  deleteConsumerGroup: false
+
+  # ---------------------------
+  # SOURCE CONNECTOR OPTIONS
+  # ---------------------------
+  offsetTopic: "offsets"
+#  pollDuration: "PT10S"
+
+annotations: {}
+#  MY_ANNOTATION: "foo-bar"
+
+labels: {}
+#  MY_LABEL: "foo-bar"
+
+restartPolicy: OnFailure
+#ttlSecondsAfterFinished: 100
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 300Mi
+  limits:
+    cpu: 500m
+    memory: 2G

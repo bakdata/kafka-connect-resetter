@@ -1,0 +1,6 @@
+.gradle/
+build/
+.idea/
+out/
+!.gitignore
+!.gitlab-ci.yml
