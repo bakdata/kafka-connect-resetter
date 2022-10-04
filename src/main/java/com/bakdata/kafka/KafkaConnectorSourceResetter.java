@@ -78,6 +78,11 @@ import picocli.CommandLine.Mixin;
  *                             Consumer poll duration
  *   -V, --version             Print version information and exit.
  * }</pre>
+ *
+ * Kafka Connect stores offsets for source connectors in a dedicated topic. The key of such an offset consists of the
+ * connector name and a connector specific partition name, e.g., {@code ["connector-name", { some-source-specific
+ * -data... }] }. This tool finds all partitions belonging to the connector that should be reset and deletes the
+ * corresponding offsets.
  */
 
 @Slf4j

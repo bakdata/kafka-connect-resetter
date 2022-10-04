@@ -42,7 +42,7 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 /**
- * This command resets the resets or deletes the consumer group of a Kafka Connect sink connector.
+ * This command resets or deletes the consumer group of a Kafka Connect sink connector.
  *
  * <pre>{@code
  * Usage: <main class> sink [-hV] [--delete-consumer-group] --brokers=<brokers>
