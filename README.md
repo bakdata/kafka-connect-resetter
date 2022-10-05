@@ -5,8 +5,11 @@
 # kafka-connect-resetter
 
 An application to reset the state of Kafka Connect connectors.
+It is available on [Docker Hub](https://hub.docker.com/r/bakdata/kafka-connect-resetter).
 
 ## Usage
+
+You can reset both source and sink connectors using this tool.
 
 ### Source resetter
 
