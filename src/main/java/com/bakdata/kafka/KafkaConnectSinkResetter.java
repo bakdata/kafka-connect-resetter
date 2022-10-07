@@ -36,6 +36,7 @@ import org.apache.kafka.clients.admin.DeleteConsumerGroupsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.GroupIdNotFoundException;
 import org.jooq.lambda.tuple.Tuple2;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -105,6 +106,10 @@ public final class KafkaConnectSinkResetter implements Runnable {
             Thread.currentThread().interrupt();
             throw new ResetterException("Failed to delete consumer group", e);
         } catch (final ExecutionException e) {
+            if (e.getCause() instanceof GroupIdNotFoundException) {
+                log.info("Consumer group {} does not exist no need to delete it.", consumerGroupID);
+                return;
+            }
             throw new ResetterException("Failed to delete consumer group", e);
         }
         log.info("Deleted consumer group {}", consumerGroupID);

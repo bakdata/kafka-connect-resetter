@@ -161,6 +161,29 @@ class KafkaConnectorSinkResetterApplicationTest {
     }
 
     @Test
+    void shouldNotFailOnConsumerGroupNotFound(@TempDir final File tempDir)
+            throws InterruptedException, IOException, ExecutionException {
+
+        final Path tempFile = Files.createFile(tempDir.toPath().resolve("test-delete-consumer-group.txt"));
+        this.createConnectCluster(tempFile);
+        delay(10, TimeUnit.SECONDS);
+
+        this.connectCluster.stop();
+        this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).hasSize(1);
+
+        final KafkaConnectResetterApplication app = new KafkaConnectResetterApplication();
+
+        final CommandLine commandLine = getCLI(app);
+        final int exitCode = commandLine.execute("sink",
+                "another-fake-connector", // non-existing connector
+                "--brokers", this.kafkaCluster.getBrokerList(),
+                "--delete-consumer-group"
+        );
+        this.softly.assertThat(exitCode).isEqualTo(0);
+        this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).hasSize(1);
+    }
+
+    @Test
     void shouldCorrectlyResetOffsets(@TempDir final File tempDir)
             throws InterruptedException, IOException, ExecutionException {
         final Path tempFile = Files.createFile(tempDir.toPath().resolve("test-reset-offsets.txt"));
