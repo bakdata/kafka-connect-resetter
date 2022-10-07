@@ -107,7 +107,7 @@ public final class KafkaConnectSinkResetter implements Runnable {
             throw new ResetterException("Failed to delete consumer group", e);
         } catch (final ExecutionException e) {
             if (e.getCause() instanceof GroupIdNotFoundException) {
-                log.info("Consumer group {} does not exist no need to delete it.", consumerGroupID);
+                log.info("Consumer group {} does not exist, no need to delete it.", consumerGroupID);
                 return;
             }
             throw new ResetterException("Failed to delete consumer group", e);
