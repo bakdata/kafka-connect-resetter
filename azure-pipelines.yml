@@ -21,6 +21,7 @@ resources:
       type: github
       name: bakdata/bakdata-project-templates
       endpoint: bot
+      ref: tmp/upload-snapshot
 
 jobs:
   - template: azure/gradle/build.yml@templates
