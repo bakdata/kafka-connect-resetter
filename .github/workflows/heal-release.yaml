@@ -1,0 +1,16 @@
+name: Release Helm Charts
+on:
+  workflow_dispatch:
+
+jobs:
+  call-workflow-passing-data:
+    name: Release & Publish Helm chart
+    uses: bakdata/ci-templates/.github/workflows/helm-multi-release.yaml@main
+    with:
+      charts-path: "./charts"
+      subdirs: "['kafka-connect-resetter']"
+      gh-pages-branch: gh-pages
+    secrets:
+      github-username: ${{ secrets.GH_USERNAME }}
+      github-email: ${{ secrets.GH_EMAIL }}
+      github-token: ${{ secrets.GH_TOKEN }}
