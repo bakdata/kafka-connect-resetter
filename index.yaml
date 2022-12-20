@@ -1,0 +1,12 @@
+apiVersion: v1
+entries:
+  kafka-connect-resetter:
+  - apiVersion: v1
+    created: "2022-12-20T15:37:52.730147905Z"
+    description: A helm chart for deploying a Kafka Connect resetter.
+    digest: ec787323ac46f5e73f72458c4e24dd3f22a90bcfbc97be3ab72fb81045229f56
+    name: kafka-connect-resetter
+    urls:
+    - kafka-connect-resetter/kafka-connect-resetter-1.0.2.tgz
+    version: 1.0.2
+generated: "2022-12-20T15:37:52.729576496Z"
