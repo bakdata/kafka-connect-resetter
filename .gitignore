@@ -4,3 +4,4 @@ build/
 out/
 !.gitignore
 !.gitlab-ci.yml
+*.DS_Store
