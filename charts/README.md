@@ -3,8 +3,8 @@
 ## Install
 
 ```
-helm repo add bakdata-kafka-connect-resetter https://raw.githubusercontent.com/bakdata/kafka-connect-resetter/<branch_name>/charts/
-helm install bakdata-kafka-connect-resetter/kafka-connect-resetter
+helm repo add bakdata-kafka-connect-resetter https://bakdata.github.io/kafka-connect-resetter/
+helm install bakdata-kafka-connect-resetter/kafka-connect-resetter 
 ```
 
 ## Development
