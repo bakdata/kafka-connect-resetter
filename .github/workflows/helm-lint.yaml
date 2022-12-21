@@ -1,5 +1,4 @@
 name: Helm lint
-# Reusable workflow for packaging and publishing Helm charts having multiple subcharts on GitHub pages
 
 on:
   push:
