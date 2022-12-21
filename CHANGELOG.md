@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.0.3](https://github.com/bakdata/kafka-connect-resetter/tree/1.0.3) (2022-12-21)
+[Full Changelog](https://github.com/bakdata/kafka-connect-resetter/compare/1.0.2...1.0.3)
+
+**Merged pull requests:**
+
+- Release Helm charts when a new tag is pushed [\#6](https://github.com/bakdata/kafka-connect-resetter/pull/6) ([@MichaelKora](https://github.com/MichaelKora))
+
 ## [1.0.2](https://github.com/bakdata/kafka-connect-resetter/tree/1.0.2) (2022-12-20)
 [Full Changelog](https://github.com/bakdata/kafka-connect-resetter/compare/1.0.1...1.0.2)
 
