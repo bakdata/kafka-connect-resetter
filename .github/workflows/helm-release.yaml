@@ -7,7 +7,7 @@ on:
 jobs:
   call-workflow-passing-data:
     name: Release & Publish Helm chart
-    uses: bakdata/ci-templates/.github/workflows/helm-multi-release.yaml@v1.13.0
+    uses: bakdata/ci-templates/.github/workflows/helm-multi-release.yaml@v1.13.1
     with:
       charts-path: "./charts"
       subdirs: "['kafka-connect-resetter']"
