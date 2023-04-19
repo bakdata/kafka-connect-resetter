@@ -40,8 +40,10 @@ spec:
           args:
             - {{ .Values.connectorType }}
             - {{ .Values.config.connector }}
+            {{- if hasKey .Values.config "brokers" }}
             - "--brokers"
             - {{ .Values.config.brokers }}
+            {{- end }}
             {{- if eq .Values.connectorType "sink"}}
             {{- if and (hasKey .Values.config "deleteConsumerGroup") (.Values.config.deleteConsumerGroup) }}
             - "--delete-consumer-group"
@@ -61,3 +63,13 @@ spec:
             - "--config"
             - "{{- range $key, $value := .Values.config.config }}{{ $key }}={{ $value }},{{- end }}"
             {{- end }}
+          {{- if .Values.secretRefs }}
+          env:
+            {{- range $key, $value := .Values.secretRefs }}
+            - name: "{{ $key }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: "{{ $value.key }}"
+            {{- end }}
+          {{- end }}

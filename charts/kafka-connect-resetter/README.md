@@ -29,12 +29,13 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 
 ### General
 
-| Parameter          | Description                                                                   | Default  |
-|--------------------|-------------------------------------------------------------------------------|----------|
-| `connectorType`    | Type of connector that should be reset. Can be `sink` or `source`. (required) | `source` |
-| `config.brokers`   | Comma separated list of Kafka brokers to connect to. (required)               |          |
-| `config.connector` | Name of connector to reset. (required)                                        |          |
-| `config.config`    | Configurations for Kafka clients.                                             | `{}`     |
+| Parameter          | Description                                                                                                                                | Default  |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `connectorType`    | Type of connector that should be reset. Can be `sink` or `source`. (required)                                                              | `source` |
+| `config.brokers`   | Comma separated list of Kafka brokers to connect to.                                                                                       |          |
+| `config.connector` | Name of connector to reset. (required)                                                                                                     |          |
+| `config.config`    | Configurations for Kafka clients.                                                                                                          | `{}`     |
+| `secretRefs`       | Inject existing secrets as environment variables. Map key is used as environment variable name. Value consists of secret `name` and `key`. | `{}`     |
 
 ### Sink Connectors
 
