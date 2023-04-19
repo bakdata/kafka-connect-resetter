@@ -40,8 +40,6 @@ resources:
     cpu: 500m
     memory: 2G
 
-secrets: { }
-#  MY_SECRET: fo-bar
 secretRefs: { }
 #  MY_SECRET:
 #    name: secretName
