@@ -63,6 +63,7 @@ spec:
             - "--config"
             - "{{- range $key, $value := .Values.config.config }}{{ $key }}={{ $value }},{{- end }}"
             {{- end }}
+          {{- if .Values.secretRefs }}
           env:
             {{- range $key, $value := .Values.secretRefs }}
             - name: "{{ $key }}"
@@ -71,3 +72,4 @@ spec:
                   name: {{ $value.name }}
                   key: "{{ $value.key }}"
             {{- end }}
+          {{- end }}
