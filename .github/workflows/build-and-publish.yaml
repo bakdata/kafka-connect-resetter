@@ -10,7 +10,7 @@ jobs:
     name: Java Gradle Docker
     uses: bakdata/ci-templates/.github/workflows/java-gradle-docker.yaml@1.39.0
     with:
-      docker-publisher: "gcp-bakdata-cluster" # (Required)
+      docker-publisher: "bakdata" # (Required)
       working-directory: "." # (Optional) Default is .
     secrets:
       docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
