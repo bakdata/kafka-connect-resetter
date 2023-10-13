@@ -1,0 +1,25 @@
+name: Build and Publish
+
+on:
+  push:
+    tags: ["**"]
+    branches: ["**"]
+
+jobs:
+  build-and-publish:
+    name: Java Gradle Docker
+    uses: bakdata/ci-templates/.github/workflows/java-gradle-docker.yaml@1.39.0
+    with:
+      docker-publisher: "bakdata"
+    secrets:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_TOKEN }}
+      github-username: ${{ secrets.GH_USERNAME }}
+      github-token: ${{ secrets.GH_TOKEN }}
+      ossrh-password: ${{ secrets.SONATYPE_OSSRH_PASSWORD }}
+      ossrh-username: ${{ secrets.SONATYPE_OSSRH_USERNAME }}
+      signing-key-id: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
+      signing-password: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
+      signing-secret-key-ring: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING }}
+      sonar-token: ${{ secrets.SONARCLOUD_TOKEN }}
+      sonar-organization: ${{ secrets.SONARCLOUD_ORGANIZATION }}
