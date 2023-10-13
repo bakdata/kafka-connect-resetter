@@ -11,7 +11,6 @@ jobs:
     uses: bakdata/ci-templates/.github/workflows/java-gradle-docker.yaml@1.39.0
     with:
       docker-publisher: "bakdata" # (Required)
-      working-directory: "." # (Optional) Default is .
     secrets:
       docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker-password: ${{ secrets.DOCKERHUB_TOKEN }}
