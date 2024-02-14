@@ -3,6 +3,8 @@
 
 - no changes!
 
+- no changes!
+
 
 ## [1.0.5](https://github.com/bakdata/kafka-connect-resetter/tree/1.0.5) (2023-04-19)
 [Full Changelog](https://github.com/bakdata/kafka-connect-resetter/compare/1.0.4...1.0.5)
