@@ -64,3 +64,7 @@ dependencies {
     }
     testImplementation(group = "org.apache.kafka", name = "connect-file", version = kafkaVersion)
 }
+
+tasks.named("closeRepository") {
+    mustRunAfter("publishToNexus")
+}
