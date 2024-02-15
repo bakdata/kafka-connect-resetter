@@ -3,8 +3,8 @@ description = "An application to reset the state of Kafka Connect connectors"
 plugins {
     `java-library`
     id("net.researchgate.release") version "3.0.2"
-    id("com.bakdata.sonar") version "1.1.11"
-    id("com.bakdata.sonatype") version "1.1.11"
+    id("com.bakdata.sonar") version "1.1.14"
+    id("com.bakdata.sonatype") version "1.1.14"
     id("org.hildan.github.changelog") version "1.12.1"
     id("com.google.cloud.tools.jib") version "3.4.0"
     id("io.freefair.lombok") version "6.6.3"
@@ -63,8 +63,4 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-log4j12")
     }
     testImplementation(group = "org.apache.kafka", name = "connect-file", version = kafkaVersion)
-}
-
-tasks.named("closeRepository") {
-    mustRunAfter("publishToNexus")
 }
