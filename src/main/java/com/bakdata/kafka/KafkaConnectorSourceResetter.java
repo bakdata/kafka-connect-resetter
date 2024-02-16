@@ -192,7 +192,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
     private <K, V> List<PartitionInfo> partitionsForOffsetTopic(final Consumer<K, V> consumer) {
         final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
         if (!topicsWithPartition.containsKey(this.offsetTopic)) {
-            final String message = String.format("Topic %s does not exist.", this.offsetTopic);
+            final String message = String.format("Topic '%s' does not exist.", this.offsetTopic);
             throw new IllegalArgumentException(message);
         }
         return topicsWithPartition.get(this.offsetTopic);
