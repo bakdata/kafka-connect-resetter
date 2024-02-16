@@ -122,18 +122,6 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         return converter;
     }
 
-    private static <K, V> List<PartitionInfo> partitionsFor(final Consumer<K, V> consumer, final String topic) {
-        final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
-        if (!topicsWithPartition.containsKey(topic)) {
-            final String message = String.format(
-                    "Could not fetch partitions from the offset topic '%s'. Check if the offset topic name is set "
-                            + "correctly.",
-                    topic);
-            throw new IllegalArgumentException(message);
-        }
-        return topicsWithPartition.get(topic);
-    }
-
     @Override
     public void run() {
         final String id = this.createId();
@@ -146,6 +134,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         this.resetPartitions(partitions, kafkaConfig);
         log.info("Finished resetting {}", this.sharedOptions.getConnectorName());
     }
+
 
     private void resetPartitions(final Iterable<byte[]> partitions, final Map<String, Object> kafkaConfig) {
         try (final Producer<byte[], byte[]> producer = createProducer(kafkaConfig)) {
@@ -191,13 +180,22 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         final Deserializer<byte[]> byteArrayDeserializer = new ByteArrayDeserializer();
         final Consumer<byte[], byte[]> consumer =
                 new KafkaConsumer<>(kafkaConfig, byteArrayDeserializer, byteArrayDeserializer);
-        final List<PartitionInfo> partitions = partitionsFor(consumer, this.offsetTopic);
+        final List<PartitionInfo> partitions = this.partitionsForOffsetTopic(consumer);
         final List<TopicPartition> topicPartitions = partitions.stream()
                 .map(KafkaConnectorSourceResetter::toTopicPartition)
                 .collect(Collectors.toList());
         consumer.assign(topicPartitions);
         consumer.seekToBeginning(topicPartitions);
         return consumer;
+    }
+
+    private <K, V> List<PartitionInfo> partitionsForOffsetTopic(final Consumer<K, V> consumer) {
+        final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
+        if (!topicsWithPartition.containsKey(this.offsetTopic)) {
+            final String message = String.format("Topic %s does not exist.", this.offsetTopic);
+            throw new IllegalArgumentException(message);
+        }
+        return topicsWithPartition.get(this.offsetTopic);
     }
 
 }
