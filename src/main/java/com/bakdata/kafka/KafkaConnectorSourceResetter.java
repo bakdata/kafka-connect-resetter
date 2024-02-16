@@ -124,9 +124,6 @@ public final class KafkaConnectorSourceResetter implements Runnable {
 
     @Override
     public void run() {
-        if (this.offsetTopic.isBlank()) {
-            throw new IllegalArgumentException("--offset-topic should be set and cannot be blank.");
-        }
         final String id = this.createId();
         final Map<String, Object> kafkaConfig = this.sharedOptions.createKafkaConfig();
         kafkaConfig.put(ConsumerConfig.CLIENT_ID_CONFIG, id);
@@ -182,20 +179,25 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         final Deserializer<byte[]> byteArrayDeserializer = new ByteArrayDeserializer();
         final Consumer<byte[], byte[]> consumer =
                 new KafkaConsumer<>(kafkaConfig, byteArrayDeserializer, byteArrayDeserializer);
-        final List<PartitionInfo> partitions = consumer.partitionsFor(this.offsetTopic);
-        if (partitions.isEmpty()) {
-            final String message = String.format(
-                    "Could not fetch partitions from the offset topic '%s'. Check if the offset topic name is set "
-                            + "correctly.",
-                    this.offsetTopic);
-            throw new IllegalArgumentException(message);
-        }
+        final List<PartitionInfo> partitions = partitionsFor(consumer, this.offsetTopic);
         final List<TopicPartition> topicPartitions = partitions.stream()
                 .map(KafkaConnectorSourceResetter::toTopicPartition)
                 .collect(Collectors.toList());
         consumer.assign(topicPartitions);
         consumer.seekToBeginning(topicPartitions);
         return consumer;
+    }
+
+    private static <K, V> List<PartitionInfo> partitionsFor(final Consumer<K, V> consumer, final String topic) {
+        final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
+        if (!topicsWithPartition.containsKey(topic)) {
+            final String message = String.format(
+                    "Could not fetch partitions from the offset topic '%s'. Check if the offset topic name is set "
+                            + "correctly.",
+                    topic);
+            throw new IllegalArgumentException(message);
+        }
+        return topicsWithPartition.get(topic);
     }
 
 }
