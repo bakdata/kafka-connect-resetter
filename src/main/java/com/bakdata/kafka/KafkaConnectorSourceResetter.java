@@ -24,7 +24,6 @@
 
 package com.bakdata.kafka;
 
-import jakarta.validation.constraints.NotBlank;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
