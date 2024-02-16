@@ -24,6 +24,7 @@
 
 package com.bakdata.kafka;
 
+import jakarta.validation.constraints.NotBlank;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -124,6 +125,9 @@ public final class KafkaConnectorSourceResetter implements Runnable {
 
     @Override
     public void run() {
+        if(this.offsetTopic.isBlank()) {
+            throw new IllegalArgumentException("--offset-topic should be set and cannot be blank.");
+        }
         final String id = this.createId();
         final Map<String, Object> kafkaConfig = this.sharedOptions.createKafkaConfig();
         kafkaConfig.put(ConsumerConfig.CLIENT_ID_CONFIG, id);
@@ -180,6 +184,12 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         final Consumer<byte[], byte[]> consumer =
                 new KafkaConsumer<>(kafkaConfig, byteArrayDeserializer, byteArrayDeserializer);
         final List<PartitionInfo> partitions = consumer.partitionsFor(this.offsetTopic);
+        if(partitions.isEmpty()) {
+            final String message = String.format(
+                    "Could not fetch partitions from the offset topic '%s'. Check if the offset topic name is set correctly.",
+                    this.offsetTopic);
+            throw new IllegalStateException(message);
+        }
         final List<TopicPartition> topicPartitions = partitions.stream()
                 .map(KafkaConnectorSourceResetter::toTopicPartition)
                 .collect(Collectors.toList());
