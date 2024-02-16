@@ -122,6 +122,18 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         return converter;
     }
 
+    private static <K, V> List<PartitionInfo> partitionsFor(final Consumer<K, V> consumer, final String topic) {
+        final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
+        if (!topicsWithPartition.containsKey(topic)) {
+            final String message = String.format(
+                    "Could not fetch partitions from the offset topic '%s'. Check if the offset topic name is set "
+                            + "correctly.",
+                    topic);
+            throw new IllegalArgumentException(message);
+        }
+        return topicsWithPartition.get(topic);
+    }
+
     @Override
     public void run() {
         final String id = this.createId();
@@ -186,18 +198,6 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         consumer.assign(topicPartitions);
         consumer.seekToBeginning(topicPartitions);
         return consumer;
-    }
-
-    private static <K, V> List<PartitionInfo> partitionsFor(final Consumer<K, V> consumer, final String topic) {
-        final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
-        if (!topicsWithPartition.containsKey(topic)) {
-            final String message = String.format(
-                    "Could not fetch partitions from the offset topic '%s'. Check if the offset topic name is set "
-                            + "correctly.",
-                    topic);
-            throw new IllegalArgumentException(message);
-        }
-        return topicsWithPartition.get(topic);
     }
 
 }
