@@ -123,6 +123,38 @@ class KafkaConnectorSourceResetterApplicationTest {
         this.softly.assertThat(valuesAfterReset).hasSize(6);
     }
 
+    @Test
+    void shouldExitOneWhenOffsetTopicIsSetIncorrectly() throws InterruptedException {
+        this.createConnectCluster();
+        delay(10, TimeUnit.SECONDS);
+        final List<String> values = this.kafkaCluster.readValues(ReadKeyValues.from(TOPIC)
+                .with(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
+                .with(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
+                .build());
+        this.softly.assertThat(values)
+                .hasSize(3);
+        this.connectCluster.stop();
+        delay(10, TimeUnit.SECONDS);
+        final KafkaConnectResetterApplication app = new KafkaConnectResetterApplication();
+
+        final CommandLine commandLine = getCLI(app);
+        final int exitCode = commandLine.execute("source",
+                CONNECTOR_NAME,
+                "--brokers", this.kafkaCluster.getBrokerList(),
+                "--offset-topic", "wrong-offset-topic"
+        );
+        this.softly.assertThat(exitCode)
+                .isEqualTo(1);
+        this.createConnectCluster();
+        delay(10, TimeUnit.SECONDS);
+        final List<String> valuesAfterReset = this.kafkaCluster.readValues(ReadKeyValues.from(TOPIC)
+                .with(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
+                .with(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
+                .build());
+        this.softly.assertThat(valuesAfterReset)
+                .hasSize(3);
+    }
+
     private void createConnectCluster() {
         this.connectCluster = new EmbeddedConnect(EmbeddedConnectConfig.kafkaConnect()
                 .with(DistributedConfig.OFFSET_STORAGE_TOPIC_CONFIG, OFFSETS)

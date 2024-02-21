@@ -80,9 +80,9 @@ import picocli.CommandLine.Mixin;
  * }</pre>
  *
  * Kafka Connect stores offsets for source connectors in a dedicated topic. The key of such an offset consists of the
- * connector name and a connector specific partition name, e.g., {@code ["connector-name", { some-source-specific
- * -data... }] }. This tool finds all partitions belonging to the connector that should be reset and deletes the
- * corresponding offsets.
+ * connector name and a connector specific partition name, e.g.,
+ * {@code ["connector-name", { some-source-specific -data... }] }. This tool finds all partitions belonging to the
+ * connector that should be reset and deletes the corresponding offsets.
  */
 
 @Slf4j
@@ -135,6 +135,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         log.info("Finished resetting {}", this.sharedOptions.getConnectorName());
     }
 
+
     private void resetPartitions(final Iterable<byte[]> partitions, final Map<String, Object> kafkaConfig) {
         try (final Producer<byte[], byte[]> producer = createProducer(kafkaConfig)) {
             producer.initTransactions();
@@ -179,13 +180,22 @@ public final class KafkaConnectorSourceResetter implements Runnable {
         final Deserializer<byte[]> byteArrayDeserializer = new ByteArrayDeserializer();
         final Consumer<byte[], byte[]> consumer =
                 new KafkaConsumer<>(kafkaConfig, byteArrayDeserializer, byteArrayDeserializer);
-        final List<PartitionInfo> partitions = consumer.partitionsFor(this.offsetTopic);
+        final List<PartitionInfo> partitions = this.partitionsForOffsetTopic(consumer);
         final List<TopicPartition> topicPartitions = partitions.stream()
                 .map(KafkaConnectorSourceResetter::toTopicPartition)
                 .collect(Collectors.toList());
         consumer.assign(topicPartitions);
         consumer.seekToBeginning(topicPartitions);
         return consumer;
+    }
+
+    private <K, V> List<PartitionInfo> partitionsForOffsetTopic(final Consumer<K, V> consumer) {
+        final Map<String, List<PartitionInfo>> topicsWithPartition = consumer.listTopics();
+        if (!topicsWithPartition.containsKey(this.offsetTopic)) {
+            final String message = String.format("Topic '%s' does not exist.", this.offsetTopic);
+            throw new IllegalArgumentException(message);
+        }
+        return topicsWithPartition.get(this.offsetTopic);
     }
 
 }
