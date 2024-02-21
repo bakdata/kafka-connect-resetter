@@ -1,26 +1,14 @@
 description = "An application to reset the state of Kafka Connect connectors"
 
-buildscript {
-    repositories {
-        maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-        }
-    }
-    dependencies {
-        classpath("com.bakdata.gradle:sonar:1.1.16-SNAPSHOT")
-    }
-}
-
 plugins {
     `java-library`
     id("net.researchgate.release") version "3.0.2"
+    id("com.bakdata.sonar") version "1.1.16"
     id("com.bakdata.sonatype") version "1.1.14"
     id("org.hildan.github.changelog") version "2.2.0"
     id("com.google.cloud.tools.jib") version "3.4.0"
     id("io.freefair.lombok") version "8.4"
 }
-
-apply(plugin = "com.bakdata.sonar")
 
 allprojects {
     group = "com.bakdata.kafka"
