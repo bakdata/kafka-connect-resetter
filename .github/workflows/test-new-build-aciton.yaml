@@ -1,0 +1,18 @@
+name: Build and Publish
+
+on:
+  push:
+    tags: ["**"]
+    branches: ["**"]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build and Publish
+        uses: bakdata/ci-templates/actions/java-gradle-build-push-jib-multi-plaftorm@f867c322c43ecb40e81a169d29546d72551a3d3a
+        with:
+          full-image-name: "us-central1-docker.pkg.dev/gcp-bakdata-cluster/gradle-docker-push-test/test1"
+          additional-tags: "a,b,c"
