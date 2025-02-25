@@ -24,39 +24,28 @@
 
 package com.bakdata.kafka;
 
-import static net.mguenther.kafka.junit.EmbeddedKafkaCluster.provisionWith;
-import static net.mguenther.kafka.junit.EmbeddedKafkaClusterConfig.newClusterConfig;
-import static net.mguenther.kafka.junit.EmbeddedKafkaConfig.brokers;
-import static net.mguenther.kafka.junit.TopicConfig.withName;
-import static net.mguenther.kafka.junit.Wait.delay;
-import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_CONFIG;
-import static org.apache.kafka.common.config.TopicConfig.CLEANUP_POLICY_DELETE;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import kafka.server.KafkaConfig$;
-import net.mguenther.kafka.junit.EmbeddedConnect;
-import net.mguenther.kafka.junit.EmbeddedConnectConfig;
-import net.mguenther.kafka.junit.EmbeddedKafkaCluster;
-import net.mguenther.kafka.junit.SendValues;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.connect.file.FileStreamSinkConnector;
-import org.apache.kafka.connect.json.JsonConverterConfig;
 import org.apache.kafka.connect.runtime.ConnectorConfig;
-import org.apache.kafka.connect.runtime.distributed.DistributedConfig;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.storage.StringConverter;
+import org.apache.kafka.connect.util.clusters.EmbeddedConnectCluster;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -68,27 +57,20 @@ import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 @ExtendWith(SoftAssertionsExtension.class)
-class KafkaConnectorSinkResetterApplicationTest {
+class KafkaConnectSinkResetterApplicationTest {
 
     private static final String TOPIC = "topic";
     private static final String CONNECTOR_NAME = "test";
-    private static final String OFFSETS = "offsets";
-    private final EmbeddedKafkaCluster kafkaCluster = createKafkaCluster();
+    private static final Map<String, Object> PRODUCER_PROPERTIES = Map.of(
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
+    );
     @InjectSoftAssertions
     private SoftAssertions softly;
-    private EmbeddedConnect connectCluster;
+    private final EmbeddedConnectCluster connectCluster = new EmbeddedConnectCluster.Builder()
+            .name("test-cluster")
+            .build();
     private Admin adminClient;
-
-    static EmbeddedKafkaCluster createKafkaCluster() {
-        return provisionWith(newClusterConfig()
-                .configure(brokers()
-                        // FIXME Since Kafka 3.0, there is a problem with the cleanup policy of the connect offset
-                        //  topic
-                        //  https://github.com/mguenther/kafka-junit/issues/70
-                        .with(KafkaConfig$.MODULE$.LogCleanupPolicyProp(), "compact")
-                )
-        );
-    }
 
     static CommandLine getCLI(final KafkaConnectResetterApplication app) {
         final CommandLine commandLine = new CommandLine(app);
@@ -97,34 +79,28 @@ class KafkaConnectorSinkResetterApplicationTest {
         return commandLine;
     }
 
-    private static Properties config(final Path tempFile) {
-        final Properties properties = new Properties();
-        properties.setProperty(ConnectorConfig.NAME_CONFIG, CONNECTOR_NAME);
-        properties.setProperty(ConnectorConfig.CONNECTOR_CLASS_CONFIG, FileStreamSinkConnector.class.getName());
-        properties.setProperty(ConnectorConfig.VALUE_CONVERTER_CLASS_CONFIG, StringConverter.class.getName());
-        properties.setProperty(ConnectorConfig.KEY_CONVERTER_CLASS_CONFIG, StringConverter.class.getName());
-        properties.setProperty(FileStreamSinkConnector.FILE_CONFIG, tempFile.toString());
-        properties.setProperty(SinkConnector.TOPICS_CONFIG, TOPIC);
+    private static Map<String, String> config(final Path tempFile) {
+        final Map<String, String> properties = new HashMap<>();
+        properties.put(ConnectorConfig.CONNECTOR_CLASS_CONFIG, FileStreamSinkConnector.class.getName());
+        properties.put(ConnectorConfig.VALUE_CONVERTER_CLASS_CONFIG, StringConverter.class.getName());
+        properties.put(ConnectorConfig.KEY_CONVERTER_CLASS_CONFIG, StringConverter.class.getName());
+        properties.put(FileStreamSinkConnector.FILE_CONFIG, tempFile.toString());
+        properties.put(SinkConnector.TOPICS_CONFIG, TOPIC);
         return properties;
     }
 
     @AfterEach
     void tearDown() {
-        if (this.connectCluster != null) {
-            this.connectCluster.stop();
-        }
+        this.connectCluster.stop();
         if (this.adminClient != null) {
             this.adminClient.close();
         }
-        this.kafkaCluster.stop();
     }
 
     @BeforeEach
     void setup() {
-        this.kafkaCluster.start();
-        this.kafkaCluster.createTopic(withName(TOPIC)
-                .with(CLEANUP_POLICY_CONFIG, CLEANUP_POLICY_DELETE)
-                .build());
+        this.connectCluster.start();
+        this.connectCluster.kafka().createTopic(TOPIC);
         this.adminClient = this.createAdminClient();
     }
 
@@ -133,12 +109,15 @@ class KafkaConnectorSinkResetterApplicationTest {
             throws InterruptedException, IOException, ExecutionException {
 
         final Path tempFile = Files.createFile(tempDir.toPath().resolve("test-delete-consumer-group.txt"));
-        this.createConnectCluster(tempFile);
-        delay(10, TimeUnit.SECONDS);
+        this.connectCluster.configureConnector(CONNECTOR_NAME, config(tempFile));
+        Thread.sleep(Duration.ofSeconds(10L));
 
-        this.kafkaCluster.send(SendValues.to(TOPIC, "test-1", "test-2").build());
-        delay(10, TimeUnit.SECONDS);
-        this.connectCluster.stop();
+        try (final Producer<String, String> producer = this.createProducer()) {
+            producer.send(new ProducerRecord<>(TOPIC, null, "test-1"));
+            producer.send(new ProducerRecord<>(TOPIC, null, "test-2"));
+        }
+        Thread.sleep(Duration.ofSeconds(10L));
+        this.connectCluster.deleteConnector(CONNECTOR_NAME);
         this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).hasSize(1);
 
         final KafkaConnectResetterApplication app = new KafkaConnectResetterApplication();
@@ -147,16 +126,16 @@ class KafkaConnectorSinkResetterApplicationTest {
         this.softly.assertThat(tempFile).hasContent("test-1\ntest-2\n");
         final int exitCode = commandLine.execute("sink",
                 CONNECTOR_NAME,
-                "--brokers", this.kafkaCluster.getBrokerList(),
+                "--brokers", this.connectCluster.kafka().bootstrapServers(),
                 "--delete-consumer-group"
         );
         this.softly.assertThat(exitCode).isEqualTo(0);
 
         this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).isEmpty();
 
-        this.createConnectCluster(tempFile);
+        this.connectCluster.configureConnector(CONNECTOR_NAME, config(tempFile));
 
-        delay(10, TimeUnit.SECONDS);
+        Thread.sleep(Duration.ofSeconds(10L));
         this.softly.assertThat(tempFile).hasContent("test-1\ntest-2\ntest-1\ntest-2\n");
     }
 
@@ -165,10 +144,10 @@ class KafkaConnectorSinkResetterApplicationTest {
             throws InterruptedException, IOException, ExecutionException {
 
         final Path tempFile = Files.createFile(tempDir.toPath().resolve("test-delete-consumer-group.txt"));
-        this.createConnectCluster(tempFile);
-        delay(10, TimeUnit.SECONDS);
+        this.connectCluster.configureConnector(CONNECTOR_NAME, config(tempFile));
+        Thread.sleep(Duration.ofSeconds(10L));
 
-        this.connectCluster.stop();
+        this.connectCluster.deleteConnector(CONNECTOR_NAME);
         this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).hasSize(1);
 
         final KafkaConnectResetterApplication app = new KafkaConnectResetterApplication();
@@ -176,7 +155,7 @@ class KafkaConnectorSinkResetterApplicationTest {
         final CommandLine commandLine = getCLI(app);
         final int exitCode = commandLine.execute("sink",
                 "another-fake-connector", // non-existing connector
-                "--brokers", this.kafkaCluster.getBrokerList(),
+                "--brokers", this.connectCluster.kafka().bootstrapServers(),
                 "--delete-consumer-group"
         );
         this.softly.assertThat(exitCode).isEqualTo(0);
@@ -187,14 +166,17 @@ class KafkaConnectorSinkResetterApplicationTest {
     void shouldCorrectlyResetOffsets(@TempDir final File tempDir)
             throws InterruptedException, IOException, ExecutionException {
         final Path tempFile = Files.createFile(tempDir.toPath().resolve("test-reset-offsets.txt"));
-        this.createConnectCluster(tempFile);
-        delay(10, TimeUnit.SECONDS);
+        this.connectCluster.configureConnector(CONNECTOR_NAME, config(tempFile));
+        Thread.sleep(Duration.ofSeconds(10L));
 
-        this.kafkaCluster.send(SendValues.to(TOPIC, "test-1", "test-2").build());
-        delay(10, TimeUnit.SECONDS);
+        try (final Producer<String, String> producer = this.createProducer()) {
+            producer.send(new ProducerRecord<>(TOPIC, null, "test-1"));
+            producer.send(new ProducerRecord<>(TOPIC, null, "test-2"));
+        }
+        Thread.sleep(Duration.ofSeconds(10L));
 
         this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).hasSize(1);
-        this.connectCluster.stop();
+        this.connectCluster.deleteConnector(CONNECTOR_NAME);
         final KafkaConnectResetterApplication app = new KafkaConnectResetterApplication();
 
         final CommandLine commandLine = getCLI(app);
@@ -202,30 +184,30 @@ class KafkaConnectorSinkResetterApplicationTest {
         final int exitCode =
                 commandLine.execute("sink",
                         CONNECTOR_NAME,
-                        "--brokers", this.kafkaCluster.getBrokerList()
+                        "--brokers", this.connectCluster.kafka().bootstrapServers()
                 );
         this.softly.assertThat(exitCode).isEqualTo(0);
-        this.createConnectCluster(tempFile);
+        this.connectCluster.configureConnector(CONNECTOR_NAME, config(tempFile));
 
         this.softly.assertThat(this.adminClient.listConsumerGroups().all().get()).hasSize(1);
 
-        delay(10, TimeUnit.SECONDS);
+        Thread.sleep(Duration.ofSeconds(10L));
         this.softly.assertThat(tempFile).hasContent("test-1\ntest-2\ntest-1\ntest-2\n");
-    }
-
-    private void createConnectCluster(final Path tempFile) {
-        this.connectCluster = new EmbeddedConnect(EmbeddedConnectConfig.kafkaConnect()
-                .with(DistributedConfig.OFFSET_STORAGE_TOPIC_CONFIG, OFFSETS)
-                .deployConnector(config(tempFile))
-                .build(), this.kafkaCluster.getBrokerList(), "connect"
-        );
-        this.connectCluster.start();
     }
 
     private Admin createAdminClient() {
         final Map<String, Object> properties = new HashMap<>();
-        properties.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, this.kafkaCluster.getBrokerList());
-        properties.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
+        properties.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, this.connectCluster.kafka().bootstrapServers());
         return AdminClient.create(properties);
+    }
+
+    @SuppressWarnings("unchecked") // Producer always uses byte[] although serializer is customizable
+    private <K, V> Producer<K, V> createProducer(final Map<String, Object> properties) {
+        return (Producer<K, V>) this.connectCluster.kafka()
+                .createProducer(properties);
+    }
+
+    private Producer<String, String> createProducer() {
+        return this.createProducer(PRODUCER_PROPERTIES);
     }
 }

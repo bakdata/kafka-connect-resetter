@@ -52,8 +52,21 @@ dependencies {
     testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-params", version = junitVersion)
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = junitVersion)
     testImplementation(group = "org.assertj", name = "assertj-core", version = "3.27.2")
-    testImplementation(group = "net.mguenther.kafka", name = "kafka-junit", version = "3.6.0") {
-        exclude(group = "org.slf4j", module = "slf4j-log4j12")
-    }
     testImplementation(group = "org.apache.kafka", name = "connect-file", version = kafkaVersion)
+    testImplementation(group = "org.apache.kafka", name = "connect-runtime", version = kafkaVersion)
+    testImplementation(
+        group = "org.apache.kafka",
+        name = "connect-runtime",
+        version = kafkaVersion,
+        classifier = "test"
+    )
+    testImplementation(group = "org.apache.kafka", name = "kafka-clients", version = kafkaVersion, classifier = "test")
+    testImplementation(group = "org.apache.kafka", name = "kafka_2.13", version = kafkaVersion)
+    testImplementation(group = "org.apache.kafka", name = "kafka_2.13", version = kafkaVersion, classifier = "test")
+    testImplementation(
+        group = "org.apache.kafka",
+        name = "kafka-server-common",
+        version = kafkaVersion,
+        classifier = "test"
+    )
 }
