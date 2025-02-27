@@ -35,7 +35,7 @@ spec:
     spec:
       restartPolicy: {{ .Values.restartPolicy }}
       containers:
-        - name: "cleanup-job"
+        - name: {{ .Chart.Name }}
           image: "{{ .Values.image }}:{{ .Values.imageTag }}"
           imagePullPolicy: "{{ .Values.imagePullPolicy }}"
           resources:
