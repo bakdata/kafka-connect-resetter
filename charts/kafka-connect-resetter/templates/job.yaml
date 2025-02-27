@@ -3,11 +3,15 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "cleanup-job.fullname" . }}
+  name: {{ include "cleanup-job.fullname" . }}
+{{- if .Values.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.annotations }}
+    {{ $key | quote }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
   labels:
-    app: {{ template "cleanup-job.name" . }}
-    chart: {{ template "cleanup-job.chart" . }}
-    release: {{ .Release.Name }}
+    {{- include "cleanup-job.labels" . | nindent 4 }}
     {{- range $key, $value := .Values.labels }}
     {{ $key }}: {{ $value }}
     {{- end }}
@@ -17,22 +21,21 @@ spec:
   {{- end }}
   template:
     metadata:
-    {{- if .Values.annotations }}
+    {{- if .Values.podAnnotations }}
       annotations:
-      {{- range $key, $value := .Values.annotations }}
+      {{- range $key, $value := .Values.podAnnotations }}
         {{ $key | quote }}: {{ $value | quote }}
       {{- end }}
     {{- end }}
       labels:
-        app: {{ template "cleanup-job.name" . }}
-        release: {{ .Release.Name }}
-        {{- range $key, $value := .Values.labels }}
+        {{- include "cleanup-job.labels" . | nindent 8 }}
+        {{- range $key, $value := .Values.podLabels }}
         {{ $key }}: {{ $value }}
         {{- end }}
     spec:
       restartPolicy: {{ .Values.restartPolicy }}
       containers:
-        - name: {{ template "cleanup-job.name" . }}
+        - name: "cleanup-job"
           image: "{{ .Values.image }}:{{ .Values.imageTag }}"
           imagePullPolicy: "{{ .Values.imagePullPolicy }}"
           resources:
