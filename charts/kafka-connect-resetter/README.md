@@ -12,10 +12,13 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 
 | Parameter                 | Description                                                                                                            | Default                                    |
 |---------------------------|------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| `nameOverride`            | The name of the Kubernetes deployment.                                                                                 | `bakdata/kafka-connect-resetter`           |
+| `nameOverride`            | The name of the chart.                                                                                                 |                                            |
+| `fullnameOverride`        | The full qualified app name.                                                                                           |                                            |
 | `resources`               | See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/                                     | see [values.yaml](values.yaml) for details |
-| `annotations`             | Map of custom annotations to attach to the pod spec.                                                                   | `{}`                                       |
-| `labels`                  | Map of custom labels to attach to the pod spec.                                                                        | `{}`                                       |
+| `annotations`             | Map of custom annotations to attach to the job spec.                                                                   | `{}`                                       |
+| `labels`                  | Map of custom labels to attach to the job spec.                                                                        | `{}`                                       |
+| `podAnnotations`          | Map of custom annotations to attach to the pod spec.                                                                   | `{}`                                       |
+| `podLabels`               | Map of custom labels to attach to the pod spec.                                                                        | `{}`                                       |
 | `restartPolicy`           | [Restart policy](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy) to use for the job. | `OnFailure`                                |
 | `ttlSecondsAfterFinished` | See https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/#ttl-after-finished-controller.         |                                            |
 
