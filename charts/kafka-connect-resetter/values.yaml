@@ -37,7 +37,7 @@ podLabels: {}
 #  MY_LABEL: "foo-bar"
 
 restartPolicy: OnFailure
-#ttlSecondsAfterFinished: 100
+# ttlSecondsAfterFinished: 100
 
 resources:
   requests:
