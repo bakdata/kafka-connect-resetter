@@ -88,7 +88,7 @@ import picocli.CommandLine.Mixin;
 @Slf4j
 @Setter
 @Command(name = "source", mixinStandardHelpOptions = true)
-public final class KafkaConnectorSourceResetter implements Runnable {
+public final class KafkaConnectSourceResetter implements Runnable {
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4)
             .appendValue(ChronoField.MONTH_OF_YEAR, 2)
@@ -182,7 +182,7 @@ public final class KafkaConnectorSourceResetter implements Runnable {
                 new KafkaConsumer<>(kafkaConfig, byteArrayDeserializer, byteArrayDeserializer);
         final List<PartitionInfo> partitions = this.partitionsForOffsetTopic(consumer);
         final List<TopicPartition> topicPartitions = partitions.stream()
-                .map(KafkaConnectorSourceResetter::toTopicPartition)
+                .map(KafkaConnectSourceResetter::toTopicPartition)
                 .collect(Collectors.toList());
         consumer.assign(topicPartitions);
         consumer.seekToBeginning(topicPartitions);

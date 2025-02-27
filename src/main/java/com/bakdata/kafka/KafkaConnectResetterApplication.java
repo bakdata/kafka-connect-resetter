@@ -24,18 +24,17 @@
 
 package com.bakdata.kafka;
 
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
 /**
  * This application resets the Kafka Connect connectors. Available commands are {@code source} and {@code sink}.
  */
-@Command(subcommands = {KafkaConnectorSourceResetter.class, KafkaConnectSinkResetter.class},
+@Command(subcommands = {KafkaConnectSourceResetter.class, KafkaConnectSinkResetter.class},
         mixinStandardHelpOptions = true)
 public final class KafkaConnectResetterApplication {
     private static final String ENV_PREFIX = "APP_";

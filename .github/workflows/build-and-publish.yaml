@@ -4,18 +4,18 @@ on:
   push:
     tags: ["**"]
     branches: ["**"]
+  pull_request:
 
 jobs:
   build-and-publish:
     name: Java Gradle Docker
-    uses: bakdata/ci-templates/.github/workflows/java-gradle-docker.yaml@1.40.6
+    uses: bakdata/ci-templates/.github/workflows/java-gradle-docker.yaml@1.62.0
     with:
-      java-version: 17
+      java-version: 21
       docker-publisher: "bakdata"
     secrets:
       docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker-password: ${{ secrets.DOCKERHUB_TOKEN }}
-      github-username: ${{ secrets.GH_USERNAME }}
       github-token: ${{ secrets.GH_TOKEN }}
       ossrh-password: ${{ secrets.SONATYPE_OSSRH_PASSWORD }}
       ossrh-username: ${{ secrets.SONATYPE_OSSRH_USERNAME }}
