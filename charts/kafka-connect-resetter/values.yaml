@@ -47,7 +47,7 @@ resources:
     cpu: 500m
     memory: 2G
 
-secretRefs: { }
+secretRefs: {}
 #  MY_SECRET:
 #    name: secretName
 #    key: secretKey
