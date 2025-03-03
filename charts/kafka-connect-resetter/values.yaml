@@ -1,4 +1,5 @@
-nameOverride: kafka-connect-resetter
+nameOverride: ""
+fullnameOverride: ""
 
 image: bakdata/kafka-connect-resetter
 imageTag: latest
@@ -29,8 +30,14 @@ annotations: {}
 labels: {}
 #  MY_LABEL: "foo-bar"
 
+podAnnotations: {}
+#  MY_ANNOTATION: "foo-bar"
+
+podLabels: {}
+#  MY_LABEL: "foo-bar"
+
 restartPolicy: OnFailure
-#ttlSecondsAfterFinished: 100
+# ttlSecondsAfterFinished: 100
 
 resources:
   requests:
@@ -40,7 +47,7 @@ resources:
     cpu: 500m
     memory: 2G
 
-secretRefs: { }
+secretRefs: {}
 #  MY_SECRET:
 #    name: secretName
 #    key: secretKey
