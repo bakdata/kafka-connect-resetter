@@ -1,8 +1,15 @@
 # Change Log
 
-## [1.1.0](https://github.com/bakdata/kafka-connect-resetter/tree/1.1.0) (2025-03-03)
-[View commits](https://github.com/bakdata/kafka-connect-resetter/compare/1.1.0...1.1.0)
+## [1.1.1](https://github.com/bakdata/kafka-connect-resetter/tree/1.1.1) (2025-03-10)
+[View commits](https://github.com/bakdata/kafka-connect-resetter/compare/1.1.1...1.1.1)
 
+
+## [1.1.1](https://github.com/bakdata/kafka-connect-resetter/tree/1.1.1) (2025-03-10)
+[View commits](https://github.com/bakdata/kafka-connect-resetter/compare/1.1.0...1.1.1)
+
+**Merged pull requests:**
+
+- Do not add Helm labels to templates [\#24](https://github.com/bakdata/kafka-connect-resetter/pull/24) ([@philipp94831](https://github.com/philipp94831))
 
 ## [1.1.0](https://github.com/bakdata/kafka-connect-resetter/tree/1.1.0) (2025-03-03)
 [View commits](https://github.com/bakdata/kafka-connect-resetter/compare/1.0.10...1.1.0)
