@@ -2,9 +2,9 @@ apiVersion: v1
 entries:
   kafka-connect-resetter:
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.136910097Z"
+    created: "2025-03-10T09:33:14.924052503Z"
     description: A helm chart for deploying a Kafka Connect resetter.
-    digest: 24ccaf1f8a6536728cf91699469ca8478a7fa98ad0f7cd621e9603dfb82625ed
+    digest: 2bbdb73d4e9e4519fd78d737919705f5d12d9757304a4d0b6c8470751b3d91d3
     maintainers:
     - email: opensource@bakdata.com
       name: bakdata
@@ -14,7 +14,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.1.1-SNAPSHOT.tgz
     version: 1.1.1-SNAPSHOT
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.136576843Z"
+    created: "2025-03-10T09:33:14.923798838Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 4416475ad67b8d4c85b56dfb0035148d3fec6e2ff292f4d9a68b4b7528dcd30d
     maintainers:
@@ -26,7 +26,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.1.0.tgz
     version: 1.1.0
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.133713519Z"
+    created: "2025-03-10T09:33:14.921830606Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: bb9887a592e662c7202de178f602876e360860c43a2bbcae138108062513fc5a
     maintainers:
@@ -38,7 +38,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.11-SNAPSHOT.tgz
     version: 1.0.11-SNAPSHOT
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.133252005Z"
+    created: "2025-03-10T09:33:14.921570849Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 23316225aafd0b0b5479875ee60d4f44dcfa6c7b40f9314b485026f877170711
     name: kafka-connect-resetter
@@ -46,7 +46,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.10.tgz
     version: 1.0.10
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.136203523Z"
+    created: "2025-03-10T09:33:14.923576641Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 53d459eb1faf4f996a92efe9fb818a8f965064a9b4d8d43f16bf5c52522c848b
     name: kafka-connect-resetter
@@ -54,7 +54,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.9.tgz
     version: 1.0.9
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.135933748Z"
+    created: "2025-03-10T09:33:14.923370975Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: be776d91706e0b82c336dce55d9ea768dbd69c541383195ddb6d5e2ce91fcaa9
     name: kafka-connect-resetter
@@ -62,7 +62,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.8.tgz
     version: 1.0.8
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.135661308Z"
+    created: "2025-03-10T09:33:14.923177833Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: a6a745c89b461b51bca7099017f935213479fa77ee32e16b91c2563f8a4bfe9d
     name: kafka-connect-resetter
@@ -70,7 +70,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.7.tgz
     version: 1.0.7
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.135361376Z"
+    created: "2025-03-10T09:33:14.922972578Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 9d54e61f694112163834f4d489b2730be6c290fd7d43a7f374df9c122cf77a48
     name: kafka-connect-resetter
@@ -78,7 +78,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.6.tgz
     version: 1.0.6
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.135058389Z"
+    created: "2025-03-10T09:33:14.922752375Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 5dcb0a6bd873aa04ddd8a3aad30042c213583bf320721babe359152b11224d01
     name: kafka-connect-resetter
@@ -86,7 +86,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.5.tgz
     version: 1.0.5
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.134756162Z"
+    created: "2025-03-10T09:33:14.922523606Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 16aa3a8c1fc075d565efe41927fbadf5069a3a530d3bcc4aab1c1e610a6593bd
     name: kafka-connect-resetter
@@ -94,7 +94,7 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.4.tgz
     version: 1.0.4
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.134457022Z"
+    created: "2025-03-10T09:33:14.922311478Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: 53af056a6c925eee0e1c7680897756c543e72b3b08afa45f6ced31ed41ddb96f
     name: kafka-connect-resetter
@@ -102,11 +102,11 @@ entries:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.3.tgz
     version: 1.0.3
   - apiVersion: v1
-    created: "2025-03-10T07:50:52.134148965Z"
+    created: "2025-03-10T09:33:14.922094842Z"
     description: A helm chart for deploying a Kafka Connect resetter.
     digest: ec787323ac46f5e73f72458c4e24dd3f22a90bcfbc97be3ab72fb81045229f56
     name: kafka-connect-resetter
     urls:
     - kafka-connect-resetter/kafka-connect-resetter-1.0.2.tgz
     version: 1.0.2
-generated: "2025-03-10T07:50:52.132628747Z"
+generated: "2025-03-10T09:33:14.92118781Z"
